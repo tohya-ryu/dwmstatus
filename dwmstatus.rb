@@ -30,7 +30,7 @@ fork {
       end
       temp = tmp
       weather_wait_thread = Thread.new {
-        sleep 600
+        sleep OPEN_WEATHER_INTERVAL
       }
     end
     ibus_engine = %x{ ibus engine }
