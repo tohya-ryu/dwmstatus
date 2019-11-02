@@ -7,23 +7,30 @@ fork {
   temp = " ??.??°C"
   while true do
     unless weather_wait_thread.alive?
+      excaught = false
       tmp = temp
       options = { units: "metric", APPID: OPEN_WEATHER_API_KEY }
-      out = OpenWeather::Current.city_id(OPEN_WEATHER_CITY_ID, options)
-      if out.is_a?(Hash)
-        if out.has_key?('main')
-          if out['main'].is_a?(Hash)
-            if out['main'].has_key?('temp')
-              tmp = out['main']['temp']
-              tmp = tmp.to_s
-              if tmp.length < 6
-                s = 6 - tmp.length
-                while s > 0
-                  tmp.prepend(" ")
-                  s -= 1
+      begin
+        out = OpenWeather::Current.city_id(OPEN_WEATHER_CITY_ID, options)
+      rescue exception
+        excaught = true
+      end
+      unless excaught
+        if out.is_a?(Hash)
+          if out.has_key?('main')
+            if out['main'].is_a?(Hash)
+              if out['main'].has_key?('temp')
+                tmp = out['main']['temp']
+                tmp = tmp.to_s
+                if tmp.length < 6
+                  s = 6 - tmp.length
+                  while s > 0
+                    tmp.prepend(" ")
+                    s -= 1
+                  end
                 end
+                tmp << "°C"
               end
-              tmp << "°C"
             end
           end
         end
