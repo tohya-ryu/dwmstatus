@@ -8,7 +8,7 @@ def has_internet?
     dns_resolver = Resolv::DNS.new()
     dns_resolver.getaddress(DNS_CHECK_ADDRESS)
     return true
-  rescue Resolv::ResolvError => e
+  rescue exception
     return false
   end
 end
