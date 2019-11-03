@@ -1,11 +1,33 @@
 require 'date'
 require 'open_weather'
+require 'resolv'
+
+def has_internet?
+  # https://stackoverflow.com/a/22837368
+  dns_resolver = Resolv::DNS.new()
+  begin
+    dns_resolver.getaddress(DNS_CHECK_ADDRESS)
+    return true
+  rescue Resolv::ResolvError => e
+    return false
+  end
+end
 
 fork {
   weather_wait_thread = Thread.new { }
   weather_wait_thread.join
+  dns_wait_thread = Thread.new { }
+  dns_wait_thread.join
   temp = " ??.??°C"
+  internetf = false
+  connstate = ""
   while true do
+    unless dns_wait_thread.alive?
+      internetf = has_internet?
+      dns_wait_thread = Thread.new {
+        sleep DNS_CHECK_INTERVAL
+      }
+    end
     unless weather_wait_thread.alive?
       excaught = false
       tmp = temp
@@ -40,6 +62,12 @@ fork {
         sleep OPEN_WEATHER_INTERVAL
       }
     end
+    if internetf
+      connstate = "[C-I]"
+    else
+      connstate = "[C-O]"
+    end
+
     ibus_engine = %x{ ibus engine }
     user = %x{ whoami }
     host = %x{ hostname }
@@ -57,6 +85,7 @@ fork {
     datetime = Time.now.strftime("%a %Y-%m-%d %H:%M:%S")
     str = "#{user}@#{host} "
     str << "#{ibus_engine} BAT(#{battery_capacity}#{battery_status}) "
+    str << "#{connstate} "
     str << "#{temp} #{datetime}"
     %x{ xsetroot -name " #{str} " }
     sleep 1
