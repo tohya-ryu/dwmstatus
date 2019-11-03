@@ -8,7 +8,7 @@ def has_internet?
     dns_resolver = Resolv::DNS.new()
     dns_resolver.getaddress(DNS_CHECK_ADDRESS)
     return true
-  rescue exception
+  rescue StandardError
     return false
   end
 end
@@ -34,7 +34,7 @@ fork {
       options = { units: "metric", APPID: OPEN_WEATHER_API_KEY }
       begin
         out = OpenWeather::Current.city_id(OPEN_WEATHER_CITY_ID, options)
-      rescue exception
+      rescue StandardError
         excaught = true
       end
       unless excaught
