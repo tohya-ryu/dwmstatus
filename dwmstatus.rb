@@ -4,8 +4,8 @@ require 'resolv'
 
 def has_internet?
   # https://stackoverflow.com/a/22837368
-  dns_resolver = Resolv::DNS.new()
   begin
+    dns_resolver = Resolv::DNS.new()
     dns_resolver.getaddress(DNS_CHECK_ADDRESS)
     return true
   rescue Resolv::ResolvError => e
