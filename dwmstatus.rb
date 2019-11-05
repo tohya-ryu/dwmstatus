@@ -22,12 +22,14 @@ fork {
   internetf = false
   connstate = ""
   while true do
+=begin
     unless dns_wait_thread.alive?
       internetf = has_internet?
       dns_wait_thread = Thread.new {
         sleep DNS_CHECK_INTERVAL
       }
     end
+=end
     unless weather_wait_thread.alive?
       excaught = false
       tmp = temp
@@ -62,7 +64,8 @@ fork {
         sleep OPEN_WEATHER_INTERVAL
       }
     end
-    if internetf
+
+    if has_internet?
       connstate = "[C-I]"
     else
       connstate = "[C-O]"
