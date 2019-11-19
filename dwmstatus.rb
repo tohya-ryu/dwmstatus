@@ -6,9 +6,12 @@ def has_internet?
   # https://stackoverflow.com/a/22837368
   begin
     dns_resolver = Resolv::DNS.new()
+    dns_resolver.timeouts = 0.5
     dns_resolver.getaddress(DNS_CHECK_ADDRESS)
+    dns_resolver.close
     return true
   rescue StandardError
+    dns_resolver.close
     return false
   end
 end
